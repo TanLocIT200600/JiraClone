@@ -1,37 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Button, Space, Tag } from 'antd';
+import { Table, Button, Space, Tag, Avatar, Popover, AutoComplete } from 'antd';
 import { useDispatch, useSelector } from 'react-redux'
 import { GET_ALL_PROJECT_SAGA } from '../../store/constants/CyberBug';
 import ReactHtmlParser from 'html-react-parser';
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons"
 import FormEditProject from '../../components/Forms/FormEditProject/FormEditProject';
+import { Popconfirm, message } from 'antd';
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-  },
-  {
-    key: '4',
-    name: 'Jim Red',
-    age: 32,
-    address: 'London No. 2 Lake Park',
-  },
-];
 
 export default function ProjectManagement(props) {
   const dispatch = useDispatch();
@@ -102,17 +77,6 @@ export default function ProjectManagement(props) {
       },
       // sortDirection: ['descend'],
     },
-    // {
-    //   title: 'description',
-    //   dataIndex: 'description',
-    //   key: 'description',
-    //   render: (text, record, index) => {
-    //     let jsxContent = ReactHtmlParser(text);
-    //     return <div key={index}>
-    //       {jsxContent}
-    //     </div>
-    //   }
-    // },
     {
       title: 'categoryName',
       dataIndex: 'categoryName',
@@ -136,6 +100,26 @@ export default function ProjectManagement(props) {
       },
     },
     {
+      title: 'members',
+      key: 'members',
+      render: (text, record, index) => {
+        return <div>
+          {record.members?.map((member, index) => {
+            return <Avatar key={index} src={member.avatar} />
+          })}
+
+          {record.members?.length > 3 ? <Avatar>...</Avatar> : ' '}
+          <Popover placement="topLeft" title={"Add User"} content={() => {
+            return <AutoComplete style={{ width: "100%" }} onSearch={(value) => {
+              console.log("value", value);
+            }}></AutoComplete>
+          }} trigger="click">
+            <Button>+</Button>
+          </Popover>
+        </div>
+      }
+    },
+    {
       title: 'Action',
       key: 'action',
       render: (text, record, index) => (
@@ -154,7 +138,20 @@ export default function ProjectManagement(props) {
             dispatch(actionEditProject);
 
           }}><EditOutlined /></button>
-          <button className="btn btn-danger"><DeleteOutlined /></button>
+          <Popconfirm
+            title="Are you sure to delete this project?"
+            onConfirm={() => {
+              dispatch({
+                type: 'DELETE_PROJECT_SAGA',
+                idProject: record.id,
+              })
+            }}
+            okText="Yes"
+            cancelText="No"
+          >
+            <button className="btn btn-danger"><DeleteOutlined /></button>
+          </Popconfirm>
+
         </Space>
       )
     },

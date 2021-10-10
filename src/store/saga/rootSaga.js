@@ -12,5 +12,6 @@ export function* rootSaga() {
         CreateProject.theoDoiCreateProjectSaga(),
         GetAllProject.theoDoiAllProject(),
         CreateProject.theoDoiUpdateProjectSaga(),
+        CreateProject.theoDoiDeleteProjectSaga(),
     ]);
 }
